@@ -1,5 +1,5 @@
 # follow-up
-Follow up is a web service for tracking events of user's interests, enlightening how the course of events affect reality.
+Follow Up은 사용자가 관심 있는 이벤트를 추적하고, 사건의 흐름이 현실에 어떤 영향을 미치는지 알려주는 웹 서비스입니다.
 
-## Experimental excersize
-1. 
+## 실험 연습
+1. 스펙 기반 개발

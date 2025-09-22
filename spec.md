@@ -1,204 +1,205 @@
-Follow Up Specification
+# Follow Up 애플리케이션 명세서
 
-0. Document Control
-Version: 0.2.0  
-Status: Draft  
-Owner: TBD  
-Last Updated: 2025-09-11  
-Change Log:  
-- 0.2.0 Restructured spec, enumerated requirements, added metrics & governance sections, split data model to separate appendix file.  
-- 0.1.0 Initial draft.  
+*   **버전:** 0.2.0
+*   **상태:** 초안
+*   **소유자:** 박동윤
+*   **최종 업데이트:** 2025-09-11
+*   **변경 로그:**
+    *   0.2.0: 명세서 구조 변경, 요구사항 상세화, 성공 지표 및 거버넌스 섹션 추가, 데이터 모델을 별도 부록으로 분리
+    *   0.1.0: 초기 초안 작성
 
-1. Summary
-Follow Up is a service that tracks events within user-defined categories for each user and summarizes how each category's situation has changed over a user-defined period (e.g., today vs yesterday, or any custom date range). It also helps users catch up after an absence by explaining what changed and why. 
+---
 
-2. Goals
-- Let users monitor domains (categories) they care about.
-- Show how the state of a category changed between two points in time.
-- Explain changes using the events that occurred in the interval.
-- Provide a fast “catch up since I was away” view.
-- Allow guests to explore predefined categories without sign-up.
-- Enable registered users to create custom categories with tailored instructions (future enrichment use).
+## 1. 개요
+Follow Up은 사용자가 정의한 카테고리 내에서 발생하는 이벤트를 추적하는 서비스입니다. 사용자가 설정한 기간(예: 오늘 vs 어제) 동안 각 카테고리의 상태가 어떻게 변했는지 비교하고 요약 정보를 제공합니다. 이를 통해 사용자는 자리를 비운 후에도 주요 변경 사항과 그 원인을 신속하게 파악할 수 있습니다.
 
-3. Out of Scope (OS)
-OS-001 Real-time streaming updates.  
-OS-002 Collaboration / shared categories between users.  
-OS-003 Advanced analytics or forecasting beyond summarization.  
-OS-004 Native mobile applications (web-first).  
-OS-005 Third-party connector auto-ingestion (future enhancement).  
+## 2. 목표
+ * 사용자가 관심 있는 도메인(카테고리)을 지속적으로 모니터링할 수 있도록 지원
+ * 특정 기간 동안 카테고리의 상태 변화를 시각적으로 제공
+ * 발생한 이벤트를 기반으로 상태 변경의 원인을 설명
+ * 장기 부재 후에도 핵심 변경 사항을 신속하게 파악할 수 있는 요약 뷰 제공
+ * 게스트 사용자가 회원가입 없이 미리 정의된 카테고리를 탐색할 수 있도록 허용
+ * (추후 확장) 등록된 사용자가 맞춤형 지침을 통해 커스텀 카테고리를 생성하는 기능 제공
+ 
+## 3. 개발 범위 제외 (Out of Scope)
+ * OS-001: 실시간 스트리밍 업데이트
+ * OS-002: 사용자 간 협업 및 카테고리 공유 기능
+ * OS-003: 단순 요약을 넘어서는 고급 분석 및 예측 기능
+ * OS-004: 네이티브 모바일 애플리케이션 (웹 버전 우선 개발)
+ * OS-005: 서드파티 서비스 연동을 통한 자동 데이터 수집 (추후 개선)
 
-4. Personas
-- Guest: Browses predefined categories (read-only).
-- Registered User: Manages custom categories and views all features.
-- Returning User After Absence: Wants a concise change digest.
+## 4. 사용자 페르소나
+ * 게스트: 미리 정의된 카테고리를 읽기 전용 모드로 탐색
+ * 등록된 사용자: 자신만의 커스텀 카테고리를 생성·관리하며 모든 기능 사용 가능
+ * 장기 부재 후 복귀한 사용자: 부재 기간 동안의 핵심 변경 사항에 대한 간결한 요약을 필요로 함
 
-5. Core Concepts
-Category: A domain being tracked (e.g., Finance).  
-Event: A discrete piece of information affecting a category.  
-Situation: Summarized representation of category state at a point in time.  
-Period Comparison: Start situation + end situation + diff + explaining events.  
-Absence Catch-Up: Comparison from last seen timestamp to now.
+## 5. 핵심 개념
+ * Category (카테고리): 추적 대상이 되는 특정 도메인 (예: 금융)
+ * Event (이벤트): 카테고리에 영향을 미치는 개별 정보 조각
+ * Situation (상황): 특정 시점까지의 이벤트들을 종합하여 요약한 카테고리의 상태
+ * Period Comparison (기간 비교): 두 시점의 상태(Situation)와 그 차이(diff), 그리고 변경 원인이 된 이벤트들을 함께 보여주는 기능
+ * Absence Catch-Up (부재 후 따라잡기): 사용자의 마지막 접속 시점부터 현재까지의 모든 변경 사항을 요약하여 제공하는 기능
 
-5.1 System Context (Placeholder)
-High-level actors: User (guest/authenticated), Web App (frontend), API Service, AI Service, Job Runner (situations), Data Store, Metrics/Logging. Diagram to be added.
+### 5.1 시스템 컨텍스트 (Placeholder)
+ * 주요 액터(Actor): 사용자(게스트/인증), 웹 앱(프론트엔드), API 서비스, AI 서비스, 백그라운드 작업 실행기(상황 생성), 데이터 저장소, 메트릭/로깅 시스템. (다이어그램 추후 추가 예정)
 
-5.2 Domain Entities (Conceptual Only)
-- Category: Named scope users monitor.
-- Event: Time-stamped fact influencing a Category.
-- Situation: Summarized state derived from events up to a point.
-- Comparison: Computed difference between two states plus contributing events.
-- User: Actor creating and viewing categories/events.
+### 5.2 도메인 엔티티 (개념)
+ * Category: 사용자가 모니터링하는 이름이 부여된 범위
+ * Event: 카테고리에 영향을 미치는 타임스탬프가 기록된 사실
+ * Situation: 특정 시점까지의 이벤트로부터 파생된 요약 상태
+ * Comparison: 두 상태 간의 계산된 차이와 여기에 기여한 이벤트들의 집합
+ * User: 카테고리와 이벤트를 생성하고 조회하는 액터
 
-6. Predefined Categories (guest-visible)
-- Finance
-- Technology
-- Software Ecosystem
+## 6. 미리 정의된 카테고리 (게스트에게 공개)
+ * Finance (금융)
+ * Technology (기술)
+ * Software Ecosystem (소프트웨어 생태계)
 
-7. Functional Requirements (Enumerated)
-FR-001 Guest can retrieve list of predefined categories.  
-FR-002 Only active predefined categories appear in guest list.  
-FR-003 Guest can view today vs past day (up to last week) summary for a predefined category.  
-FR-004 Guest attempting to create a category is prompted to sign up; no category is created.  
-FR-005 User can register via Google social login (Only login method for MVP)
-FR-006 System records user.lastSeenAt at successful authenticated session start.  
-FR-007 Authenticated user can create a category (name required; description & instructions optional). Creating a category without a name is not allowed. Category instructions are stored and limited to 2000 characters (hard validation).  
-FR-028 
-FR-009 Authenticated user can update own category name, description, instructions.  
-FR-010 User can archive (soft delete) own category.  
-FR-011 Archived categories are excluded from default listing endpoints.  
-FR-012 Authenticated user can list categories: own + active predefined.  
-FR-013 User can view category detail including latest situation summary (materialized or on-demand).  
-FR-014 Authenticated user can create an event for a category they own.  
-FR-015 System defaults event.occurredAt to current UTC timestamp if omitted.  
-FR-018 Daily situation and news collecting job executes once per 24h UTC for each active category.  
-FR-019 If no events since prior situation boundary, events for the day is shown as "nothing happened for this day" and situation is shown same as the day before for the day.
-FR-020 User can request on-demand period comparison specifying categoryId, startDate, endDate (inclusive dates).  
-FR-021 Comparison resolves start situation (closest on/before startDate) or the day before if absent
-FR-022 Comparison resolves end situation (closest on/before endDate) or generates provisional current state.  
-FR-023 Comparison returns: startSummary, endSummary, diffSummary, orderedEvents, keyMetricsChanges (empty structures allowed).  
-FR-024 Today-vs-yesterday endpoint is a convenience wrapper over generic comparison.  
-FR-025 Absence catch-up uses user.lastSeenAt (date floor) to now for each category.  
-FR-026 Catch-up excludes categories with zero events & no state change since lastSeenAt.  
-FR-027 Events in responses are ordered by importance (high > normal > low) then chronological within each tier.  
+## 7. 기능 요구사항
+ * FR-001: 게스트는 미리 정의된 카테고리 목록을 조회할 수 있다.
+ * FR-002: 게스트에게는 활성화된 미리 정의 카테고리만 표시된다.
+ * FR-003: 게스트는 미리 정의된 카테고리에 대해 '오늘'과 특정 과거일(최대 1주일 전)을 비교하는 요약을 볼 수 있다.
+ * FR-004: 게스트가 카테고리 생성을 시도할 경우, 회원가입 페이지로 안내되며 카테고리는 생성되지 않는다.
+ * FR-005: 사용자는 Google 소셜 로그인을 통해 가입할 수 있다 (MVP에서는 유일한 로그인 방식).
+ * FR-006: 시스템은 인증 세션이 시작될 때 사용자의 마지막 접속 시간(user.lastSeenAt)을 기록한다.
+ * FR-007: 인증된 사용자는 카테고리를 생성할 수 있다 (이름 필수, 설명 및 지침은 선택). 이름 없이는 카테고리 생성이 불가능하다. 카테고리 지침은 최대 2,000자까지 허용되며, 시스템은 이 제한을 강제한다.
+ * FR-009: 인증된 사용자는 자신이 소유한 카테고리의 이름, 설명, 지침을 수정할 수 있다.
+ * FR-010: 사용자는 자신이 소유한 카테고리를 아카이브(논리적 삭제)할 수 있다.
+ * FR-011: 아카이브된 카테고리는 기본 목록 조회 API의 결과에서 제외된다.
+ * FR-012: 인증된 사용자는 '자신이 소유한 카테고리'와 '활성화된 미리 정의 카테고리' 목록을 함께 조회할 수 있다.
+ * FR-013: 사용자는 카테고리의 상세 정보를 최신 상황 요약(사전에 생성되었거나 실시간으로 생성된)과 함께 조회할 수 있다.
+ * FR-014: 인증된 사용자는 자신이 소유한 카테고리에 이벤트를 추가할 수 있다.
+ * FR-015: 이벤트 생성 시 event.occurredAt 값이 없으면, 시스템은 현재 UTC 타임스탬프를 기본값으로 사용한다.
+ * FR-018: 활성화된 각 카테고리에 대해, 일일 상황 요약 및 뉴스 수집 작업이 24시간(UTC 기준)마다 한 번씩 실행된다.
+ * FR-019: 이전 상황 요약 이후 새로운 이벤트가 없으면, 해당 날짜의 요약은 "새로운 이벤트가 없습니다" 등으로 표시되고, 상황 정보는 전날과 동일하게 유지된다.
+ * FR-020: 사용자는 categoryId, startDate, endDate(해당일 포함)를 지정하여 특정 기간의 비교 데이터를 요청할 수 있다.
+ * FR-021: 비교 요청 시, 시작 시점의 상황은 startDate와 가장 가까운 과거 시점의 데이터를 기준으로 설정한다. 데이터가 없을 경우 전날을 기준으로 한다.
+ * FR-022: 비교 요청 시, 종료 시점의 상황은 endDate와 가장 가까운 과거 시점의 데이터를 기준으로 설정하며, 필요시 임시로 현재 상태를 생성하여 사용한다.
+ * FR-023: 비교 결과는 startSummary, endSummary, diffSummary, orderedEvents, keyMetricsChanges를 포함하여 반환한다 (필요시 빈 구조체 허용).
+ * FR-024: '오늘 vs 어제' 비교 API는 기간 비교 API의 편의성을 높이기 위한 래퍼(Wrapper)이다.
+ * FR-025: '부재 후 따라잡기' 기능은 사용자의 user.lastSeenAt(날짜 기준)부터 현재까지의 변경 사항을 각 카테고리별로 요약한다.
+ * FR-026: '부재 후 따라잡기' 결과에서는 마지막 접속 이후 이벤트나 상태 변화가 없는 카테고리는 제외한다.
+ * FR-027: API 응답에 사용되는 이벤트 목록은 중요도(높음 > 중간 > 낮음)를 가지며, 중요도를 선정하는 기준은 다음과 같다.
+    1. 이벤트의 영향력 (Influence)
+    2. 이벤트의 구별성 (Distinctiveness)
 
-AI Functional Requirements  
-AI-FR-001 AI generates daily situation summaries when events exist for the interval.  
-AI-FR-002 AI generates diff summaries for period comparisons.  
-AI-FR-003 AI generates catch-up digest summaries.  
-AI-FR-004 Each AI call enforces hard timeout <= 4s.  
-AI-FR-005 On AI timeout, error, or rate limit, system returns deterministic fallback diff/summary within overall SLA.  
-AI-FR-006 Fallback pathway is logged distinctly (successFlag=false).  
-AI-FR-007 AI request includes minimal redacted content per privacy rules (Section 19).  
-AI-FR-008 p95 end-to-end comparison latency with AI enabled < 2.5s.  
+### AI 기능 요구사항
+ * AI-FR-001: 이벤트가 발생한 기간에 대해, AI가 일일 상황 요약을 생성한다.
+ * AI-FR-002: AI가 두 기간을 비교하는 차이(diff) 요약을 생성한다.
+ * AI-FR-003: AI가 '부재 후 따라잡기' 요약을 생성한다.
+ * AI-FR-004: 각 AI 호출에는 최대 4초의 타임아웃(Hard Timeout)이 적용된다.
+ * AI-FR-005: AI 호출이 타임아웃, 오류, 또는 사용량 제한에 도달할 경우, 시스템은 전체 SLA 내에서 사전에 정의된 규칙에 따라 결정론적(deterministic) 대체 결과물을 반환한다.
+ * AI-FR-006: 대체 경로가 사용된 경우, successFlag=false와 같이 별도의 로그를 기록한다.
+ * AI-FR-007: AI 요청에는 개인정보 보호 규칙(섹션 12)에 따라 최소한으로 정제된 데이터만 포함된다.
+ * AI-FR-008: AI를 포함한 엔드투엔드(End-to-end) 비교 요청의 p95 응답 시간은 2.5초 미만이어야 한다.
 
-8. Non-Functional Requirements (NFR)
-NFR-002 Overall comparison with AI (including fallback) <2.5s p95.  
-NFR-003 System prepared to shard events by categoryId when total events >1M.  
-NFR-004 Simple RBAC: users may mutate only their own categories/events.  
-NFR-005 Nightly situation job retries up to 3 times on failure with exponential backoff.  
-NFR-006 Structured logs for all key operations (ingestion, comparison, situation, AI calls).  
-NFR-007 Events retained indefinitely in MVP; pruning policy deferred.  
-NFR-008 Track and surface token usage aggregates daily.  
-NFR-009 Graceful degradation ensures no hard dependency on AI for core diff output.  
+## 8. 비기능 요구사항 (NFR)
+ * NFR-002: AI(대체 로직 포함)를 사용하는 전체 비교 기능의 p95 응답 시간은 2.5초 미만을 유지해야 한다.
+ * NFR-003: 총 이벤트 수가 100만 개를 초과할 경우를 대비하여 카테고리별 데이터 샤딩(Sharding)이 가능한 구조로 설계한다.
+ * NFR-004: 단순한 역할 기반 접근 제어(RBAC)를 적용하여, 사용자는 자신의 카테고리 및 이벤트만 수정할 수 있도록 제한한다.
+ * NFR-005: 야간 상황 요약 작업 실패 시, 기하급수적 백오프(Exponential Backoff) 전략을 사용하여 최대 3회 재시도한다.
+ * NFR-006: 핵심 기능(데이터 수집, 비교, 상황 요약, AI 호출)에 대해 구조화된 로그를 기록한다.
+ * NFR-007: MVP 단계에서는 이벤트를 영구 보관하며, 데이터 정리 정책 수립은 추후로 연기한다.
+ * NFR-008: AI 토큰 사용량은 일별로 집계하여 모니터링할 수 있도록 노출한다.
+ * NFR-009: 서비스의 정상적인 기능 저하(Graceful Degradation)를 위해, AI 서비스 장애가 핵심 기능(diff 산출)에 미치는 영향을 최소화한다.
 
-9. Success Metrics
-M-001 p95 comparison latency (AI path) <2.5s.  
-M-002 Fallback diff usage rate <5% daily (7-day rolling average).  
-M-003 situation job success rate ≥99% daily.  
-M-004 Mean AI latency <1.2s.  
-M-005 Average token cost per comparison ≤ (TBD threshold) tokens.  
+## 9. 성공 지표
+ * M-001: AI 기반 비교 기능의 p95 응답 시간 < 2.5초
+ * M-002: AI 기능의 대체(Fallback) 사용률 < 5% (최근 7일 이동 평균 기준)
+ * M-003: 일일 상황 요약 작업의 성공률 ≥ 99%
+ * M-004: AI 호출 평균 응답 시간 < 1.2초
+ * M-005: 비교 요청 1회당 평균 토큰 비용 ≤ (임계값 TBD)
 
-10. Edge Cases
-EC-001 Period with zero events returns identical start/end summaries and empty diff explanation.  
-EC-002 Events spanning DST transitions use UTC normalization; no duplicate or missing hour.  
-EC-003 Large burst (>5k events in day) triggers pagination or streaming diff strategy (implementation detail) yet still returns summary within SLA (may truncate events list with indicator).  
-EC-004 AI partial output (truncated) triggers validation + fallback.  
-EC-005 Duplicate events (same id) rejected; idempotency key = event id.  
-EC-006 Category archived mid-comparison returns 410 or designated error code (decision TBD TD-7).  
+## 10. 엣지 케이스 (Edge Cases)
+ * EC-001: 이벤트가 없는 기간에 대한 비교 요청 시, 시작/종료 요약은 동일하게, diff 설명은 비어있는 상태로 반환한다.
+ * EC-002: 글로벌 시계에 관련된 기술적 문제를 처리하기 위해, 모든 시간은 UTC를 이용해 저장한다.  
+ * EC-003: 단기간에 대량의 이벤트(예: 하루 5,000건 이상)가 발생할 경우, 너무 많은 이벤트를 요약해야 해 SLA을 지키지 못할 가능성이 있다. 이에 따라 이벤트 수집 시, 데이터가 일정 크기 (실험 필요)를 넘어가지 않도록 이벤트를 요약하고 중요한 이벤트 위주로 저장해야 한다.
+ * EC-004: AI의 응답이 불완전하게(truncated) 반환될 경우, 이를 감지하고 대체 경로를 실행한다.
+ *위험: AI 제공자의 API 사용량 제한(Rate Limit) 도달 → 완화 방안: 로컬 큐(Queue) 도입 및 지터(Jitter)를 적용한 1회 재시도 후 대체 로직 실행. EC-005: 중복된 이벤트(ID 동일) 요청은 거부한다. 멱등성(Idempotency) 키는 이벤트 ID를 사용한다.
+ * EC-006: 비교 요청 처리 중 대상 카테고리가 아카이브된 경우, 410 Gone 또는 지정된 오류 코드를 반환한다 (오류 코드는 TD-7에서 결정).
 
-11. Risks & Mitigations
-R-001 AI cost spike → Mitigation: per-request token cap + daily aggregate alert.  
-R-002 situation job failure → Mitigation: retry + alert channel + fallback on-demand situations.  
-R-003 Prompt injection via event content → Mitigation: sanitize & neutralize system directives before AI call.  
-R-004 Latency regressions → Mitigation: budgets enforced in CI perf tests.  
-R-005 Data model drift → Mitigation: schema versioning & migration checklist.  
-R-006 Rate limiting from AI provider → Mitigation: local queue + jittered retry once then fallback.  
+## 11. 위험 및 완화 방안
+ * R-001 | 위험: AI 비용 급증 → 완화 방안: 요청당 토큰 사용량 제한 및 일일 사용량 집계 알림 설정. 추후, VectorDB를 이용해 거의 같은 요청에 대해서는 AI요청을 하지 않고, 저장된 데이터를
+ * R-002 | 위험: 상황 요약 작업 실패 → 완화 방안: 재시도 로직 구현, 장애 시 알림 채널 구성, 실시간(On-demand) 상황 요약 기능으로 대체.
+ * R-003 | 위험: 이벤트 콘텐츠를 통한 프롬프트 인젝션 공격 → 완화 방안: AI 호출 전, 시스템 프롬프트에 영향을 줄 수 있는 입력을 제거하거나 정제(Sanitize).
+ * R-004 | 위험: 응답 시간 저하 → 완화 방안: 성능 예산(Performance Budget)을 설정하고 CI 단계에서 검증.
+ * R-005 | 위험: 잦은 데이터 모델 변경 → 완화 방안: 스키마 버전 관리 및 체계적인 마이그레이션 절차 수립.
+ * R-006 | 위험: 이벤트 수집 시, AI 제공자의 API 사용량 제한(Rate Limit) 도달 → 완화 방안: 로컬 큐(Queue) 도입 및 지터(Jitter)를 적용한 1회 재시도 후 대체 로직 실행.
 
-12. Privacy & Redaction Rules
-P-001 Strip user emails and internal URLs before sending content to AI.  
-P-002 Remove tokens matching configured secret patterns (regex) prior to AI submission.  
-P-003 Limit AI prompt to only events within requested window + minimal category context.  
-P-004 Log redacted form, never raw sensitive content, for AI prompts.  
+ > R-006: 로컬 큐를 이용하면 서비스 노드 실패시, 재시도 큐가 유실됨. DB에 저장하는 것 또한 고려.
 
-13. Observability Specs
-LOG-001 Log each AI call: categoryId, requestType, latencyMs, tokenIn, tokenOut, successFlag, fallbackFlag.  
-LOG-002 Log situation job start/end with duration & event count.  
-MET-001 Counter events_ingested_total.  
-MET-002 Counter ai_calls_total (labels: success|fallback|errorType).  
-MET-003 Histogram ai_latency_ms.  
-MET-004 Counter situation_job_failures_total.  
-MET-005 Gauge token_usage_daily (per request type).  
-ALERT-001 Trigger alert if fallback rate >10% for 30 min.  
+## 12. 데이터 정제 규칙
+ * P-001: 사전에 정의된 비밀 패턴(정규식)과 일치하는 토큰은 AI 전송 전에 제거한다.
+ * P-002: AI 프롬프트에는 요청된 기간 내의 이벤트와 최소한의 카테고리 컨텍스트만 포함시킨다.
 
-14. Fallback Behavior Matrix
-Case: Timeout → One retry? No (direct fallback) to preserve SLA.  
-Case: Rate limit → Single retry with exponential backoff capped at 500ms then fallback.  
-Case: Provider error 5xx → One retry; on failure fallback.  
-Case: Prompt safety rejection → Sanitize & retry once; else fallback.  
-Case: Validation error (internal) → Immediate fallback.  
-All fallbacks produce deterministic diff + mark fallbackFlag=true.  
+## 13. 관찰 가능성(Observability) 사양
+ * LOG-001: 모든 AI 호출에 대해 다음 정보를 로그로 기록: categoryId, requestType, latencyMs, tokenIn, tokenOut, successFlag, fallbackFlag.
+ * LOG-002: 상황 요약 작업의 시작/종료 시점, 소요 시간, 처리한 이벤트 수를 로그로 기록.
+ * MET-001: 수집된 총 이벤트 수 카운터: events_ingested_total.
+ * MET-002: AI 총 호출 수 카운터: ai_calls_total (레이블: success|fallback|errorType).
+ * MET-003: AI 응답 시간 히스토그램: ai_latency_ms.
+ * MET-004: 상황 요약 작업 실패 총 횟수 카운터: situation_job_failures_total.
+ * MET-005: 일일 토큰 사용량 게이지: token_usage_daily (요청 유형별).
+ * ALERT-001: 30분 동안 대체 경로 사용률이 10%를 초과하면 경보를 발생시킨다.
 
-15. API Surface (Draft)
-GET /api/categories  
-POST /api/categories  
-PATCH /api/categories/{id}  
-POST /api/categories/{id}/events  
-GET /api/categories/{id}/comparison?start=YYYY-MM-DD&end=YYYY-MM-DD  
-GET /api/categories/{id}/today-vs-yesterday  
-GET /api/catch-up (auth)  
-POST /internal/situations/run (secured)  
-POST /internal/ai/rewrite (secured, optional)  
+## 14. 대체(Fallback) 동작 방식
+ * 사례: 타임아웃 발생 → 재시도 없이 즉시 대체 경로 실행 (SLA 준수 목적).
+ * 사례: 사용량 제한(Rate Limit) 도달 → 최대 500ms 내에서 기하급수적 백오프를 적용하여 1회 재시도 후 실패 시 대체 경로 실행.
+ * 사례: AI 제공자 측 서버 오류(5xx) → 1회 재시도 후 실패 시 대체 경로 실행.
+ * 사례: 프롬프트가 안전성 정책에 의해 거부된 경우 → 데이터 정제 후 1회 재시도, 실패 시 대체 경로 실행.
+ * 사례: 내부 데이터 검증 오류 → 즉시 대체 경로 실행.
+ * 참고: 모든 대체 경로는 결정론적(deterministic) diff 결과를 생성하고, fallbackFlag=true로 표시한다.
 
-16. Acceptance Criteria (Samples)
-AC-001 Guest listing returns only active predefined categories (FR-001/FR-002).  
-AC-002 Missing category name on create returns 400 (FR-008).  
-AC-003 Comparison with no events returns empty diffSummary (FR-023, EC-001).  
-AC-004 Catch-up excludes unchanged categories (FR-026).  
-AC-005 AI timeout triggers fallback diff with fallbackFlag=true and latency <2.5s (AI-FR-004/AI-FR-005/M-001).  
-AC-006 AI metadata present in AI-generated responses (FR-032).  
-AC-007 Event order respects importance then time (FR-027).  
-AC-008 Instructions >2000 chars rejected (FR-028).  
+## 15. API 엔드포인트 (초안)
+ * GET /api/categories
+ * POST /api/categories
+ * PATCH /api/categories/{id}
+ * POST /api/categories/{id}/events
+ * GET /api/categories/{id}/comparison?start=YYYY-MM-DD&end=YYYY-MM-DD
+ * GET /api/categories/{id}/today-vs-yesterday
+ * GET /api/catch-up (인증 필요)
+ * POST /internal/situations/run (내부용, 인증 필요)
+ * POST /internal/ai/rewrite (내부용, 선택 사항)
 
-17. Technical Decisions Log
-TD-1 situation storage strategy (store vs infer). Status: Pending.  
-TD-2 Pagination approach for large event lists (cursor on occurredAt+id). Status: Pending.  
-TD-3 Maximum custom categories per user (proposed 20). Status: Pending.  
-TD-4 Event enrichment / dedup logic approach. Status: Pending.  
-TD-5 Token cost guardrails (per-user & global caps). Status: Pending.  
-TD-6 Redaction strategy details (patterns list). Status: Pending.  
-TD-7 Response code for archived category access (410 vs 404). Status: Pending.  
+## 16. 인수 조건 (Acceptance Criteria) (샘플)
+ * AC-001: 게스트가 카테고리 목록 조회 시, 활성화된 미리 정의 카테고리만 반환된다 (FR-001/FR-002 충족).
+ * AC-002: 카테고리 생성 시 이름이 누락된 경우, 400 Bad Request 오류를 반환한다 (FR-007 충족).
+ * AC-003: 이벤트가 없는 기간에 대한 비교 요청 시, diffSummary가 비어있는 결과를 반환한다 (FR-023, EC-001 충족).
+ * AC-004: '부재 후 따라잡기' 기능은 변경 사항이 없는 카테고리를 결과에서 제외한다 (FR-026 충족).
+ * AC-005: AI 호출 타임아웃 시, 대체(fallback) diff 결과를 반환하며, 응답에는 fallbackFlag=true가 포함되고 전체 응답 시간은 2.5초 미만이다 (AI-FR-004/AI-FR-005/M-001 충족).
+ * AC-007: 이벤트 목록은 중요도, 그리고 시간 순으로 올바르게 정렬된다 (FR-027 충족).
+ * AC-008: 카테고리 지침이 2,000자를 초과할 경우, 요청이 거부된다 (FR-007 충족).
 
-18. Future Enhancements
-- Advanced AI reasoning traces.  
-- Webhooks / RSS feeds.  
-- Tagging events.  
-- Metrics extraction & structured metric events.  
-- Mobile push notifications.  
-- Automated event ingestion connectors.  
+## 17. 기술 결정 로그 (ADR)
+ * TD-1 | 주제: 상황(Situation) 데이터 저장 전략 (계산된 값 저장 vs 실시간 추론). 상태: 미정.
+ * TD-2 | 주제: 대량의 이벤트 목록에 대한 페이징(Paging) 방식 (occurredAt + id 커서 기반). 상태: 미정.
+ * TD-3 | 주제: 사용자당 생성 가능한 커스텀 카테고리 최대 개수 (제안: 20개). 상태: 미정.
+ * TD-4 | 주제: 이벤트 데이터 보강 및 중복 제거 로직 구현 방안. 상태: 미정.
+ * TD-5 | 주제: AI 토큰 비용 제어 방안 (사용자별/전체 한도 설정). 상태: 미정.
+ * TD-6 | 주제: 데이터 정제(Sanitization) 전략 세부 사항 (필터링할 패턴 목록). 상태: 미정.
+ * TD-7 | 주제: 아카이브된 카테고리 접근 시 반환할 HTTP 응답 코드 (410 Gone vs 404 Not Found). 상태: 미정.
 
-19. Glossary
-situation: Summarized state at or before a point in time.  
-Diff Summary: Human-readable explanation of change between two situations.  
-Catch-Up: Aggregated comparison since user’s lastSeenAt.  
-Fallback Diff: Non-AI deterministic diff when AI unavailable.  
+## 18. 향후 개선 사항
+ * 고급 AI 추론 기능 도입
+ * Webhook / RSS 피드 기능
+ * 이벤트 태깅(Tagging) 기능
+ * 구조화된 지표(Metric) 이벤트 추출 기능
+ * 모바일 푸시 알림
+ * 외부 서비스 연동을 통한 자동 이벤트 수집 커넥터
 
-20. Implementation Phases
-Phase 1 (MVP): Core auth, predefined & custom categories, manual events, today vs yesterday, basic period comparison, AI integration with fallback.  
-Phase 2: Absence catch-up, nightly situations automation, importance sorting refinements, cost/usage dashboards.  
-Phase 3: Bulk import, advanced AI reasoning enhancements, metrics extraction, connectors, mobile push.  
+## 19. 용어집
+ * Situation (상황): 특정 시점까지의 이벤트들을 종합하여 요약한 상태.
+ * Diff Summary (Diff 요약): 두 상황 간의 변화를 사람이 이해하기 쉽게 설명한 요약.
+ * Catch-Up (부재 후 따라잡기): 사용자의 마지막 접속 이후 발생한 모든 변경 사항에 대한 통합 요약.
+ * Fallback Diff (대체 결과물): AI 사용이 불가능할 때, 결정론적 규칙에 따라 생성되는 diff.
 
-21. Requirement Traceability (Placeholder)
-Future table mapping FR/AI-FR/NFR IDs → Test IDs.  
+## 20. 구현 단계
+ * 1단계 (MVP): 핵심 인증, 미리 정의 및 커스텀 카테고리 관리, 수동 이벤트 입력, '오늘 vs 어제' 및 기본 기간 비교, AI 통합 및 대체 로직 구현.
+ * 2단계: '부재 후 따라잡기' 기능, 야간 상황 요약 자동화, 이벤트 중요도 정렬 로직 고도화, 비용 및 사용량 대시보드 개발.
+ * 3단계: 대량 데이터 가져오기(Bulk Import), 고급 AI 추론 기능 개선, 구조화된 지표 추출, 외부 서비스 커넥터, 모바일 푸시 알림.
 
-22. References
-Appendix Data Model Sketch: see appendix-data-model.md  
+## 21. 요구사항 추적성 매트릭스 (Placeholder)
+ * (추후 FR/AI-FR/NFR ID와 테스트 케이스 ID를 매핑하는 테이블 추가 예정)
+
+## 22. 참고 자료
+ * 부록: 데이터 모델 스케치 (appendix-data-model.md)
